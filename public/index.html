@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Emitter</title>
+</head>
+<body>
+  <h1>Sound Emitter</h1>
+
+  <label for="api-url">API URL:</label>
+  <input type="text" id="api-url" placeholder="http://localhost:3001/dataArray" value="http://localhost:3001/dataArray">
+
+  <label for="array-size">Array Size:</label>
+  <input type="number" id="array-size" placeholder="150" value="150">
+
+  <label for="check-interval">Check Interval (seconds):</label>
+  <input type="number" id="check-interval" placeholder="30" value="30">
+
+
+  <label for="sound-select">Choose a sound:</label>
+  <select id="sound-select">
+    <option value="alert.mp3">Alert</option>
+    <option value="sound.mp3">Goat</option>
+    <option value="sound.mp3">Default</option>
+  </select>
+
+
+  <button id="start-check">Start Checking</button>
+
+  <!-- <script>
+    const eventSource = new EventSource('/events');
+    const soundSelect = document.getElementById('sound-select');
+
+    eventSource.onmessage = function(event) {
+      console.log("event.data", event.data)
+      if (event.data === 'sound') {
+        const selectedSound = soundSelect.value;
+        const audio = new Audio(selectedSound);
+        audio.play();
+      }
+    };
+  </script> -->
+
+  <script>
+    document.getElementById('start-check').addEventListener('click', () => {
+      const apiUrl = document.getElementById('api-url').value;
+      const arraySize = parseInt(document.getElementById('array-size').value, 10);
+      const checkInterval = parseInt(document.getElementById('check-interval').value, 10) * 1000; 
+      const soundSelect = document.getElementById('sound-select');
+
+      const checkArraySize = async () => {
+        console.log('beat')
+        try {
+          const response = await fetch(apiUrl);
+          const dataArray = await response.json();
+
+          if (Array.isArray(dataArray) && dataArray.length > arraySize) {
+            const event = new Event('sound');
+            document.dispatchEvent(event);
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+
+      setInterval(checkArraySize, checkInterval);
+
+      document.addEventListener('sound', () => {
+        const selectedSound = soundSelect.value;
+        const audio = new Audio(selectedSound);
+        audio.play();
+      });
+    });
+  </script>
+</body>
+</html>
